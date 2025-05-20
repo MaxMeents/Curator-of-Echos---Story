@@ -160,7 +160,10 @@
 <body>
     <div class="story-container">
         <h1>The Curator of Echoes</h1>
-
+        <h2>Part I: The Pulsar Chalet Maximus</h2>
+        <div id="part1mp3"></div>
+         <h2>Part II: Echoes and Sanctuary</h2>
+         <div id="part2mp3"></div>
         <h2>Part I: The Pulsar Chalet Maximus</h2>
 
         <p><span class="text-yellow-shimmer">"Max" Thorne</span> was 36 in the year 2045, an era already thrumming with the <span class="text-yellow-shimmer concept-highlight">nascent hum of transformative change</span>. He wasn't a scientist or an engineer, but a conceptual architect, dreaming up impossible structures for virtual environments and immersive simulations. His contemporaries were designing smart cities; Max was sketching habitats nestled in the accretion disks of black holes, just for the <span class="text-yellow-shimmer concept-highlight">intellectual thrill</span>. It was in one of these late-night creative fugues, fueled by lukewarm synth-coffee, that the image first seared itself into his mind: <span class="text-big-blue-shimmer">a simple, rustic wooden house, perched impossibly on the incandescent surface of a rapidly spinning pulsar.</span> It was an absurd, romantic notion, a stark contrast to the gleaming, hyper-efficient world taking shape around him. He saved the sketch, labeled "<span class="text-yellow-shimmer">Pulsar Chalet</span>," and occasionally revisited it, a private symbol of defiance against the encroaching logic of pure utility.</p>
@@ -218,5 +221,295 @@
         <p>There were no more goodbyes, only "see you laters." Death was an opt-out, not an inevitability. Scarcity was a forgotten word. The driving force of life was creation, connection, learning, and the shared experience of joy. Max, at 3036, looked out from the porch of his conceptual wooden house, his mother beside him, the laughter of friends from across ten centuries echoing through their personalized corner of Sanctuary. He had once dreamed of a house on a pulsar, a solitary, grand vision. But the reality, shared with everyone he had ever loved, in a universe of their own making, was infinitely richer. He had not just built a house; he had <span class="text-big-blue-shimmer">curated a haven for echoes of love, giving them a new, boundless song to sing.</span> It was a dream made real, a <span class="text-yellow-shimmer">googolplex</span> times over.</p>
 
     </div>
+    <script>
+    function createAudioPlayer(fileName, elementId) {
+    const targetElement = document.getElementById(elementId);
+
+    if (!targetElement) {
+        console.error(`Element with ID "${elementId}" not found.`);
+        return;
+    }
+
+    // Clear the target element in case it's being re-initialized
+    targetElement.innerHTML = '';
+
+    // --- 1. CREATE HTML STRUCTURE ---
+    const playerContainer = document.createElement('div');
+    playerContainer.className = 'custom-audio-player';
+
+    // Audio element (not directly visible, controlled by JS)
+    const audio = new Audio(fileName);
+
+    // Play/Pause Button
+    const playPauseBtn = document.createElement('button');
+    playPauseBtn.className = 'play-pause-btn';
+    playPauseBtn.innerHTML = '▶'; // Play icon (U+25B6)
+
+    // Current Time Display
+    const currentTimeDisplay = document.createElement('span');
+    currentTimeDisplay.className = 'time-display current-time';
+    currentTimeDisplay.textContent = '0:00';
+
+    // Progress Bar
+    const progressBarContainer = document.createElement('div');
+    progressBarContainer.className = 'progress-bar-container';
+    const progressBarFill = document.createElement('div');
+    progressBarFill.className = 'progress-bar-fill';
+    progressBarContainer.appendChild(progressBarFill);
+
+    // Total Duration Display
+    const totalDurationDisplay = document.createElement('span');
+    totalDurationDisplay.className = 'time-display total-duration';
+    totalDurationDisplay.textContent = '0:00';
+
+    // Playback Speed Button
+    const speedBtn = document.createElement('button');
+    speedBtn.className = 'speed-btn';
+    speedBtn.textContent = '1x';
+
+    // Append controls to the player container
+    playerContainer.appendChild(playPauseBtn);
+    playerContainer.appendChild(currentTimeDisplay);
+    playerContainer.appendChild(progressBarContainer);
+    playerContainer.appendChild(totalDurationDisplay);
+    playerContainer.appendChild(speedBtn);
+
+    // Append the player to the target element in the DOM
+    targetElement.appendChild(playerContainer);
+
+    // --- 2. CSS STYLING ---
+    // Styles are defined as a string and injected into a <style> tag in the <head>
+    // This ensures styles are applied without needing an external CSS file
+    // and are scoped by the class name '.custom-audio-player'.
+    const styles = `
+        .custom-audio-player {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f1f3f4; /* Light grey background */
+            border: 1px solid #dadce0; /* Subtle border */
+            border-radius: 8px; /* Rounded corners */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+            max-width: 500px; /* Max width for larger screens */
+            width: 100%; /* Responsive width */
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+            margin: 15px auto; /* Center player if it has max-width */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+
+        .custom-audio-player button {
+            background-color: #1a73e8; /* Google blue */
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 0 6px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease; /* Smooth hover transition */
+        }
+
+        .custom-audio-player button:hover {
+            background-color: #1765cf; /* Darker blue on hover */
+        }
+
+        .custom-audio-player button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .play-pause-btn {
+            font-size: 18px; /* Larger icon for play/pause */
+            padding: 8px 10px; /* Adjust padding for icon size */
+            min-width: 45px;
+        }
+
+        .progress-bar-container {
+            flex-grow: 1; /* Allow progress bar to take available space */
+            height: 10px;
+            background-color: #e0e0e0; /* Lighter grey for progress track */
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            overflow: hidden; /* Ensures fill respects border radius */
+            position: relative; /* For potential tooltips or other overlays */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #1a73e8; /* Google blue for progress fill */
+            border-radius: 5px; /* Match container's border radius */
+            transition: width 0.1s linear; /* Smooth progress update */
+        }
+
+        .time-display {
+            font-size: 13px;
+            color: #3c4043; /* Dark grey for text */
+            min-width: 40px; /* Prevent layout shifts as time changes */
+            text-align: center;
+        }
+        .current-time {
+            margin-right: 5px;
+        }
+        .total-duration {
+            margin-left: 5px;
+        }
+
+        .speed-btn {
+            min-width: 50px; /* Ensure enough space for "1.5x" */
+            font-weight: bold;
+        }
+
+        /* Basic responsiveness for smaller screens */
+        @media (max-width: 420px) {
+            .custom-audio-player {
+                flex-wrap: wrap; /* Allow items to wrap to the next line */
+                padding: 10px;
+            }
+            .progress-bar-container {
+                width: 100%; /* Full width on small screens */
+                margin: 8px 0; /* Adjust margin when wrapped */
+                order: 1; /* Change order if needed, e.g. move progress bar */
+            }
+            .time-display {
+                font-size: 12px;
+            }
+            .custom-audio-player button {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .play-pause-btn {
+                order: -1; /* Keep play/pause button first visually if wrapped */
+            }
+        }
+    `;
+
+    // Inject styles into the head, ensuring they are added only once
+    // by checking for an existing style tag with a specific ID.
+    if (!document.getElementById('custom-audio-player-styles')) {
+        const styleSheet = document.createElement("style");
+        styleSheet.id = 'custom-audio-player-styles';
+        styleSheet.type = "text/css";
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
+    }
+
+    // --- 3. JAVASCRIPT LOGIC & EVENT LISTENERS ---
+    const playbackSpeeds = [1, 1.2, 1.5];
+    let currentSpeedIndex = 0;
+
+    // Helper function to format time from seconds to M:SS
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Event listener: When audio metadata (like duration) is loaded
+    audio.addEventListener('loadedmetadata', () => {
+        totalDurationDisplay.textContent = formatTime(audio.duration);
+        progressBarFill.style.width = '0%'; // Reset progress bar
+        // Enable buttons once audio is ready (in case they were disabled by an error)
+        playPauseBtn.disabled = false;
+        speedBtn.disabled = false;
+    });
+
+    // Event listener: When the current playback time updates
+    audio.addEventListener('timeupdate', () => {
+        currentTimeDisplay.textContent = formatTime(audio.currentTime);
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        progressBarFill.style.width = `${progressPercent}%`;
+    });
+
+    // Event listener: When the audio finishes playing
+    audio.addEventListener('ended', () => {
+        playPauseBtn.innerHTML = '▶'; // Change icon to Play
+        // Optional: Reset time and progress bar, or allow re-play from start
+        // audio.currentTime = 0; // Uncomment if you want it to reset to the beginning
+        // progressBarFill.style.width = '0%';
+    });
+
+    // Event listener: For audio loading errors
+    audio.addEventListener('error', (e) => {
+        console.error(`Error loading audio file: ${fileName}`, audio.error);
+        playerContainer.innerHTML = ''; // Clear existing player controls
+        const errorMsg = document.createElement('p');
+        // Display only the filename part of the path in the error.
+        const nameOnly = fileName.includes('/') ? fileName.substring(fileName.lastIndexOf('/') + 1) : fileName;
+        errorMsg.textContent = `Error: Could not load audio "${nameOnly}".`;
+        errorMsg.style.color = 'red';
+        errorMsg.style.padding = '10px';
+        errorMsg.style.textAlign = 'center';
+        playerContainer.appendChild(errorMsg);
+        // Disable buttons if an error occurs
+        playPauseBtn.disabled = true;
+        speedBtn.disabled = true;
+        progressBarContainer.style.cursor = 'default'; // No seeking on error
+    });
+
+
+    // Event listener: Play/Pause button click
+    playPauseBtn.addEventListener('click', () => {
+        if (audio.paused || audio.ended) {
+            audio.play().catch(error => {
+                console.error("Error attempting to play audio:", error);
+                // Handle browsers blocking autoplay or other playback errors
+                playPauseBtn.innerHTML = '▶'; // Ensure button shows play if it failed
+            });
+            playPauseBtn.innerHTML = '⏸'; // Pause icon (U+23F8)
+        } else {
+            audio.pause();
+            playPauseBtn.innerHTML = '▶'; // Play icon
+        }
+    });
+
+    // Event listener: Progress bar click for seeking
+    progressBarContainer.addEventListener('click', (event) => {
+        if (!audio.duration) return; // Don't allow seeking if audio not loaded
+
+        const rect = progressBarContainer.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left; // Click position within the bar
+        const newTime = (offsetX / progressBarContainer.clientWidth) * audio.duration;
+        audio.currentTime = newTime;
+    });
+
+    // Event listener: Playback speed button click
+    speedBtn.addEventListener('click', () => {
+        currentSpeedIndex = (currentSpeedIndex + 1) % playbackSpeeds.length;
+        const newSpeed = playbackSpeeds[currentSpeedIndex];
+        audio.playbackRate = newSpeed;
+        speedBtn.textContent = `${newSpeed}x`;
+    });
+
+    // Initial setup for playback speed
+    audio.playbackRate = playbackSpeeds[currentSpeedIndex];
+    speedBtn.textContent = `${playbackSpeeds[currentSpeedIndex]}x`;
+
+    // Initially disable buttons until metadata is loaded (or if an error occurs)
+    // This prevents interaction before the audio duration is known or if the file is bad.
+    if (isNaN(audio.duration)) {
+        playPauseBtn.disabled = true;
+        speedBtn.disabled = true;
+    }
+}
+
+// --- Example Usage (Uncomment and adapt to use) ---
+/*
+// Make sure you have an element in your HTML like: <div id="audioPlayer1"></div>
+// And an audio file e.g., "song.mp3" in the same directory as your HTML/PHP file.
+
+// createAudioPlayer('song.mp3', 'audioPlayer1');
+
+// You can create multiple players:
+// <div id="audioPlayer2"></div>
+// createAudioPlayer('another-track.mp3', 'audioPlayer2');
+*/
+createAudioPlayer('The_Curator_of_Echoes.mp3', 'part1mp3');
+createAudioPlayer('The_Curator_of_Echoes 2.mp3', 'part2mp3');
+    </script>
 </body>
 </html>
